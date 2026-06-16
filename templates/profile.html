@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+<body>
+
+<div class="container">
+
+    <h1>👤 Profile Dashboard</h1>
+
+    <!-- USER INFO -->
+    <div class="card">
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Joined:</strong> {{ user.created_at }}</p>
+    </div>
+
+    <!-- MAIN STATS -->
+    <div class="grid">
+
+        <div class="stat">
+            <div class="big">{{ user.stats.total_solved }}</div>
+            <div>Total Solved</div>
+        </div>
+
+        <div class="stat">
+            <div class="big">{{ user.stats.xp }}</div>
+            <div>XP</div>
+        </div>
+
+        <div class="stat">
+            <div class="big">{{ user.stats.level }}</div>
+            <div>Level</div>
+        </div>
+
+        <div class="stat">
+            <div class="big">{{ user.stats.streak }}</div>
+            <div>🔥 Streak</div>
+        </div>
+
+    </div>
+
+    <!-- DIFFICULTY BREAKDOWN -->
+    <div class="card">
+        <h3>Difficulty Breakdown</h3>
+        <p>🟢 Easy: {{ user.stats.easy }}</p>
+        <p>🟡 Medium: {{ user.stats.medium }}</p>
+        <p>🔴 Hard: {{ user.stats.hard }}</p>
+    </div>
+
+    <a href="/" class="btn">Back to Dashboard</a>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Problem</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="edit-container">
+
+        <h1>✏️ Edit Problem</h1>
+
+        <form method="POST" class="edit-form">
+
+            <input
+                type="text"
+                name="title"
+                value="{{ problem.title }}"
+                required
+            >
+
+            <select name="difficulty">
+
+                <option value="Easy"
+                {% if problem.difficulty == "Easy" %}selected{% endif %}>
+                Easy
+                </option>
+
+                <option value="Medium"
+                {% if problem.difficulty == "Medium" %}selected{% endif %}>
+                Medium
+                </option>
+
+                <option value="Hard"
+                {% if problem.difficulty == "Hard" %}selected{% endif %}>
+                Hard
+                </option>
+
+            </select>
+
+            <input
+                type="date"
+                name="date"
+                value="{{ problem.date }}"
+                required
+            >
+
+            <button type="submit">Update Problem</button>
+
+        </form>
+
+        <a href="/" class="back-btn">⬅ Back to Home</a>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding Tracker</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="navbar">
+
+    <h2>Coding Tracker</h2>
+
+    <div>
+        <span>👤 {{ username }}</span>
+
+        <a href="/logout">
+            <button>Logout</button>
+        </a>
+        <a href="/profile">
+    <button>Profile</button>
+</a>
+    </div>
+
+</div>
+    <h2>Welcome, {{ username }} 👋</h2>
+
+    <div class="main-container">
+        <div class="leetcode-form">
+
+            <h2>⚡ Import LeetCode Stats</h2>
+        
+            <form action="/leetcode" method="POST">
+        
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="LeetCode Username"
+                    required
+                >
+        
+                <button type="submit">
+                    Fetch Stats
+                </button>
+        
+            </form>
+        
+        </div>
+
+        <h1>🚀 Coding Tracker</h1>
+        <p class="subtitle">Track your coding journey daily</p>
+
+        <!-- Stats -->
+        <div class="stats-container">
+
+            <div class="stat-card">
+                <h2>{{ total }}</h2>
+                <p>Total Solved</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>{{ easy }}</h2>
+                <p>Easy</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>{{ medium }}</h2>
+                <p>Medium</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>{{ hard }}</h2>
+                <p>Hard</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>🔥 {{ streak }}</h2>
+                <p>Day Streak</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>⚡ {{ xp }}</h2>
+                <p>Total XP</p>
+            </div>
+            
+            <div class="stat-card">
+                <h2>🏆 {{ level }}</h2>
+                <p>Level</p>
+            </div>
+        </div>
+
+    <div class="level-progress">
+    
+        <h3>
+            Level Progress:
+            {{ current_level_xp }}/100 XP
+        </h3>
+    
+        <div class="progress-bar">
+    
+                <div
+                    class="progress-fill"
+                    style="width: {{ current_level_xp }}%;"
+                ></div>
+    
+            </div>
+    
+        </div>
+
+        <div class="badge-section">
+
+        <h2>🏆 Achievements</h2>
+    
+        <div class="badges">
+    
+                {% for badge in badges %}
+        
+                    <div class="badge-card">
+                        {{ badge }}
+                    </div>
+        
+                {% endfor %}
+        
+            </div>
+        
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="difficultyChart"></canvas>
+
+        </div>
+        <div class="chart-container">
+        
+            <canvas id="dailyChart"></canvas>
+        
+        </div>
+
+        <div class="heatmap-section">
+
+        <h2>🔥 Coding Activity Heatmap</h2>
+    
+            <div class="heatmap-grid">
+        
+                {% for date, count in heatmap_data.items() %}
+        
+                    <div
+                        class="
+                            heat-box
+        
+                            {% if count == 1 %}
+                                level-1
+        
+                            {% elif count == 2 %}
+                                level-2
+        
+                            {% elif count >= 3 %}
+                                level-3
+                            {% endif %}
+                        "
+        
+                        title="{{ date }} : {{ count }} problems"
+                    >
+                    </div>
+        
+                {% endfor %}
+        
+            </div>
+        
+        </div>
+
+        <!-- Form -->
+        <div class="form-container">
+
+            <form action="/add" method="POST">
+
+                <input type="text" name="title" placeholder="Problem Name" required>
+
+                <select name="difficulty">
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+
+                <input type="date" name="date" required>
+
+                <button type="submit">Add Problem</button>
+
+            </form>
+
+        </div>
+
+        <div class="filter-container">
+        
+            <form method="GET" action="/">
+                <input
+                    type="text"
+                    name="search"
+                    placeholder="Search Problems"
+                >
+        
+                <select name="difficulty">
+        
+                    <option value="All">All</option>
+        
+                    <option value="Easy">Easy</option>
+        
+                    <option value="Medium">Medium</option>
+        
+                    <option value="Hard">Hard</option>
+        
+                </select>
+
+                <select name="sort">
+
+                    <option value="latest">Latest</option>
+                
+                    <option value="oldest">Oldest</option>
+                
+                    <option value="easy">Easy First</option>
+                
+                    <option value="hard">Hard First</option>
+                
+                </select>
+        
+                <button type="submit">Filter</button>
+        
+            </form>
+        
+        </div>
+
+        <!-- Problems -->
+        <div class="problem-section">
+
+            <h2>📚 Solved Problems</h2>
+
+            <ul class="problem-list">
+
+                {% for problem in problems %}
+
+                <li class="problem-card">
+
+                    <div>
+                        <h3>{{ problem.title }}</h3>
+
+                        <p>
+                            {{ problem.difficulty }}
+                            •
+                            {{ problem.formatted_date }}
+                        </p>
+                    </div>
+
+                    <div class="actions">
+
+                        <a href="/edit/{{ problem.id }}">
+                            <button class="edit-btn">Edit</button>
+                        </a>
+
+                        <a href="/delete/{{ problem.id }}">
+                            <button class="delete-btn">Delete</button>
+                        </a>
+
+                    </div>
+
+                </li>
+
+                {% endfor %}
+
+            </ul>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+const ctx = document.getElementById('difficultyChart');
+
+new Chart(ctx, {
+    type: 'pie',
+
+    data: {
+        labels: ['Easy', 'Medium', 'Hard'],
+
+        datasets: [{
+            data: [{{ easy }}, {{ medium }}, {{ hard }}],
+
+            backgroundColor: [
+                '#22c55e',
+                '#eab308',
+                '#ef4444'
+            ],
+
+            borderWidth: 1
+        }]
+    },
+
+    options: {
+        responsive: true
+    }
+});
+
+</script>
+
+<script>
+
+const dailyCtx = document.getElementById('dailyChart');
+
+new Chart(dailyCtx, {
+
+    type: 'bar',
+
+    data: {
+
+        labels: {{ daily_counts.keys() | list | tojson }},
+
+        datasets: [{
+            label: 'Problems Solved',
+
+            data: {{ daily_counts.values() | list | tojson }}
+        }]
+    },
+
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+</script>
+</body>
+</html>
