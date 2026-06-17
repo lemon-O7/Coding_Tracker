@@ -1,16 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Register</title>
-</head>
 <body>
+
+<div class="auth-container">
+
+    <h1>🚀 Track your Code</h1>
+
+    <p class="auth-subtitle">
+        Create your account
+    </p>
+
     {% if error %}
-        <p>{{ error }}</p>
+        <div class="error-message">
+            {{ error }}
+        </div>
     {% endif %}
 
-    <h1>Create Account</h1>
-
-    <form method="POST">
+    <form class="auth-form" method="POST">
 
         <input
             type="text"
@@ -19,16 +23,12 @@
             required
         >
 
-        <br><br>
-
         <input
             type="email"
             name="email"
             placeholder="Email"
             required
         >
-
-        <br><br>
 
         <input
             type="password"
@@ -37,16 +37,17 @@
             required
         >
 
-        <br><br>
-
         <button type="submit">
             Register
         </button>
 
     </form>
-    <p>
+
+    <p class="auth-link">
         Already have an account?
         <a href="/login">Login</a>
     </p>
+
+</div>
+
 </body>
-</html>
