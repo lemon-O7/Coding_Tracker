@@ -18,6 +18,14 @@ def get_db_connection() :
     return conn
 
 @app.route("/")
+def root():
+
+    if "user_id" in session:
+        return redirect("/dashboard")
+
+    return redirect("/register")
+
+@app.route("/dashboard")
 def home():
     if "user_id" not in session:
         return redirect("/login")
