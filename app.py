@@ -3,13 +3,15 @@ from datetime import datetime
 import sqlite3
 import os
 import requests
+from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash,check_password_hash
 import re
 
-
+load_dotenv()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "database.db")
 app = Flask(__name__)
+
 app.secret_key = os.environ.get("SECRET_KEY")
 
 def get_db_connection() :
