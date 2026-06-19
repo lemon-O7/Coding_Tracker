@@ -1,36 +1,34 @@
-import sqlite3
 import os
+import psycopg2
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "database.db")
+def init_db():
+    conn = psycopg2.connect(os.environ["DATABASE_URL"])
+    cursor = conn.cursor()
 
-conn = sqlite3.connect(DB_PATH)
-cursor = conn.cursor()
+    # Users table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        created_at TEXT
+    )
+    """)
 
-# Users table
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL,
-    created_at TEXT
-)
-""")
+    # Problems table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS problems (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id),
+        title TEXT,
+        difficulty TEXT,
+        date TEXT
+    )
+    """)
 
-# Problems table
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS problems (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
-    title TEXT,
-    difficulty TEXT,
-    date TEXT,
-    FOREIGN KEY(user_id) REFERENCES users(id)
-)
-""")
+    conn.commit()
+    cursor.close()
+    conn.close()
 
-conn.commit()
-conn.close()
-
-print("Database initialized successfully.")
+    print("Database initialized successfully.")

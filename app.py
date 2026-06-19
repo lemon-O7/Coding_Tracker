@@ -1,22 +1,20 @@
 from flask import Flask, render_template, request, redirect, session
 from datetime import datetime
-import sqlite3
 import os
 import requests
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash,check_password_hash
 import re
+import psycopg2
 
 load_dotenv()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "database.db")
 app = Flask(__name__)
 
 app.secret_key = os.environ.get("SECRET_KEY")
 
 def get_db_connection() :
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = psycopg2.connect(os.environ.get["KEY"])
     return conn
 
 @app.route("/")
@@ -39,16 +37,16 @@ def home():
 
     query = """
     SELECT * FROM problems
-    WHERE user_id = ?
+    WHERE user_id = %s
     """
     params = [session["user_id"]]
 
     if difficulty_filter and difficulty_filter != "All":
-        query += " AND difficulty = ?"
+        query += " AND difficulty = %s"
         params.append(difficulty_filter)
     
     if search:
-        query += " AND title LIKE ?"
+        query += " AND title LIKE %s"
         params.append(f"%{search}%")
 
     if sort == "latest":
@@ -266,9 +264,9 @@ def import_problems():
         existing = conn.execute(
             """
             SELECT * FROM problems
-            WHERE user_id = ?
-            AND title = ?
-            AND date = ?
+            WHERE user_id = %s
+            AND title = %s
+            AND date = %s
             """,
             (
                 session["user_id"],
@@ -296,7 +294,7 @@ def import_problems():
             """
             INSERT INTO problems
             (user_id, title, difficulty, date)
-            VALUES (?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s)
             """,
             (
                 session["user_id"],
@@ -324,7 +322,7 @@ def add() :
         """
         INSERT INTO problems
         (user_id, title, difficulty, date)
-        VALUES (?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s)
         """,
         (
             session["user_id"],
@@ -348,8 +346,8 @@ def delete(id):
     conn.execute(
     """
     DELETE FROM problems
-    WHERE id = ?
-    AND user_id = ?
+    WHERE id = %s
+    AND user_id = %s
     """,
     (
         id,
@@ -373,7 +371,7 @@ def edit(id):
     if request.method == "GET":
 
         problem = conn.execute(
-            """SELECT * FROM problems WHERE id = ? AND user_id = ?""",
+            """SELECT * FROM problems WHERE id = %s AND user_id = %s""",
             (id,session["user_id"])
         ).fetchone()
 
@@ -389,9 +387,9 @@ def edit(id):
     conn.execute(
         """
         UPDATE problems
-        SET title = ?, difficulty = ?, date = ?
-        WHERE id = ?
-        AND user_id = ?
+        SET title = %s, difficulty = %s, date = %s
+        WHERE id = %s
+        AND user_id = %s
         """,
         (
     title,
@@ -449,7 +447,7 @@ def register() :
     conn = get_db_connection()
 
     existing_user = conn.execute(
-        "SELECT * FROM users WHERE email = ?",
+        "SELECT * FROM users WHERE email = %s",
         (email,)
     ).fetchone()
 
@@ -465,7 +463,7 @@ def register() :
         INSERT INTO users
         (username, email, password_hash, created_at)
 
-        VALUES (?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s)
         """,
         (
             username,
@@ -492,7 +490,7 @@ def login():
     conn = get_db_connection()
 
     user = conn.execute(
-        "SELECT * FROM users WHERE email = ?",
+        "SELECT * FROM users WHERE email = %s",
         (email,)
     ).fetchone()
 
@@ -532,14 +530,14 @@ def profile() :
     user = conn.execute(
         """
         SELECT * FROM users
-        WHERE id = ?
+        WHERE id = %s
         """,
         (session["user_id"],)
     ).fetchone()
 
     query = """
     SELECT * FROM problems
-    WHERE user_id = ?
+    WHERE user_id = %s
     """
     params = [session["user_id"]]
     rows = conn.execute(query,params).fetchall()
