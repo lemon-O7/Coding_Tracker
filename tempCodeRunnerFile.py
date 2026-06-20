@@ -1,11 +1,8 @@
 import os
 import psycopg2
-from dotenv import load_dotenv
-
-load_dotenv()
 
 def init_db():
-    conn = psycopg2.connect(os.environ.get("DATABASE_URL"))
+    conn = psycopg2.connect(os.environ["DATABASE_URL"])
     cursor = conn.cursor()
 
     # Users table

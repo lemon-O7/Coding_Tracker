@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash,check_password_hash
 import re
 import psycopg2
+import psycopg2.extras
+from psycopg2.extras import RealDictCursor
 
 load_dotenv()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -13,8 +15,11 @@ app = Flask(__name__)
 
 app.secret_key = os.environ.get("SECRET_KEY")
 
-def get_db_connection() :
-    conn = psycopg2.connect(os.environ.get["KEY"])
+def get_db_connection():
+    conn = psycopg2.connect(
+        os.environ.get("DATABASE_URL"),
+        cursor_factory=RealDictCursor
+    )
     return conn
 
 @app.route("/")
@@ -75,16 +80,24 @@ def home():
         END
         """
 
-    rows = conn.execute(query,params).fetchall()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute(query, params)
+    rows = cur.fetchall()
+    cur.close()
 
     conn.close()
 
     problems = []
 
     for r in rows:
-        p = dict(r)  # ✅ convert to normal dict
+        p = dict(r)
 
-        p_date = datetime.strptime(p["date"], "%Y-%m-%d")
+        if isinstance(p["date"], str):
+            p_date = datetime.strptime(p["date"], "%Y-%m-%d").date()
+        else:
+            p_date = p["date"]
+
+        p["date"] = p_date
         p["formatted_date"] = p_date.strftime("%d-%m-%Y")
 
         problems.append(p)
@@ -96,29 +109,25 @@ def home():
     hard = sum(1 for p in problems if p["difficulty"] == "Hard")
 
     # 🔥 STREAK (clean version)
-    unique_dates = sorted({p["date"] for p in problems}, reverse=True)
+    unique_dates = sorted(set(p["date"] for p in problems), reverse=True)
 
     streak = 0
     today = datetime.today().date()
 
-    for i, d in enumerate(unique_dates):
-        current_date = datetime.strptime(d, "%Y-%m-%d").date()
+    current_day = today
 
-        if i == 0:
-            if (today - current_date).days > 1:
-                break
+    for d in sorted(unique_dates, reverse=True):
+        if d == current_day:
+            streak += 1
+            current_day = current_day - timedelta(days=1)
         else:
-            prev_date = datetime.strptime(unique_dates[i-1], "%Y-%m-%d").date()
-            if (prev_date - current_date).days != 1:
-                break
+            break
+        
+        daily_counts = {}
 
-        streak += 1
-    
-    daily_counts = {}
+        for p in problems:
 
-    for p in problems:
-
-        date = p["formatted_date"]
+            date = p["formatted_date"]
 
         if date in daily_counts:
             daily_counts[date] += 1
@@ -445,20 +454,25 @@ def register() :
     password_hash = generate_password_hash(password)
 
     conn = get_db_connection()
+    cur = conn.cursor()
 
-    existing_user = conn.execute(
+    cur.execute(
         "SELECT * FROM users WHERE email = %s",
         (email,)
-    ).fetchone()
-
-    if existing_user:
-        conn.close()
-        return render_template(
-        "register.html",
-        error="Email already registered."
     )
 
-    conn.execute(
+    existing_user = cur.fetchone()
+
+    if existing_user:
+        cur.close()
+        conn.close()
+
+        return render_template(
+            "register.html",
+            error="Email already registered."
+        )
+
+    cur.execute(
         """
         INSERT INTO users
         (username, email, password_hash, created_at)
@@ -488,12 +502,16 @@ def login():
     password = request.form["password"]
 
     conn = get_db_connection()
+    cur = conn.cursor()
 
-    user = conn.execute(
+    cur.execute(
         "SELECT * FROM users WHERE email = %s",
         (email,)
-    ).fetchone()
+    )
 
+    user = cur.fetchone()
+
+    cur.close()
     conn.close()
 
     if not user:
@@ -506,12 +524,16 @@ def login():
         user["password_hash"],
         password
     ):
-        return "Incorrect password"
+        return render_template(
+            "login.html",
+            error="Incorrect password"
+        )
 
     session["user_id"] = user["id"]
     session["username"] = user["username"]
 
     return redirect("/")
+
 
 @app.route("/logout")
 def logout():
