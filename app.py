@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import requests
 from dotenv import load_dotenv
@@ -123,12 +123,9 @@ def home():
         else:
             break
         
-        daily_counts = {}
-
-        for p in problems:
-
-            date = p["formatted_date"]
-
+    daily_counts = {}
+    for p in problems:
+        date = p["formatted_date"]
         if date in daily_counts:
             daily_counts[date] += 1
         else:
@@ -258,7 +255,7 @@ def import_problems():
             }
         }
         """
-
+    cur = conn.cursor()
     for item in selected:
 
 
@@ -270,7 +267,7 @@ def import_problems():
         
         #check duplicates
 
-        existing = conn.execute(
+        cur.execute(
             """
             SELECT * FROM problems
             WHERE user_id = %s
@@ -282,8 +279,10 @@ def import_problems():
                 title,
                 submission_date
             )
-        ).fetchone()
+        )
 
+        existing = cur.fetchone()
+    
         difficulty_response = requests.post(
             "https://leetcode.com/graphql",
             json={
@@ -299,7 +298,7 @@ def import_problems():
         difficulty = difficulty_data["data"]["question"]["difficulty"]
 
         if not existing:
-            conn.execute(
+            cur.execute(
             """
             INSERT INTO problems
             (user_id, title, difficulty, date)
@@ -312,22 +311,24 @@ def import_problems():
                 submission_date
             )
             )
-        
+    cur.close()
     conn.commit()
     conn.close()
     return redirect("/")
 
-@app.route("/add" , methods = ["POST"])
-def add() :
+@app.route("/add", methods=["POST"])
+def add():
     if "user_id" not in session:
         return redirect("/login")
-    
+
     title = request.form["title"]
-    difficulty=request.form["difficulty"]
-    date=request.form["date"]
+    difficulty = request.form["difficulty"]
+    date = request.form["date"]
 
     conn = get_db_connection()
-    conn.execute(
+    cur = conn.cursor()
+
+    cur.execute(
         """
         INSERT INTO problems
         (user_id, title, difficulty, date)
@@ -339,8 +340,10 @@ def add() :
             difficulty,
             date
         )
-        )
+    )
+
     conn.commit()
+    cur.close()
     conn.close()
 
     return redirect("/")
@@ -349,22 +352,24 @@ def add() :
 def delete(id):
     if "user_id" not in session:
         return redirect("/login")
-    
-    conn = get_db_connection()
 
-    conn.execute(
-    """
-    DELETE FROM problems
-    WHERE id = %s
-    AND user_id = %s
-    """,
-    (
-        id,
-        session["user_id"]
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        DELETE FROM problems
+        WHERE id = %s
+        AND user_id = %s
+        """,
+        (
+            id,
+            session["user_id"]
+        )
     )
-)
 
     conn.commit()
+    cur.close()
     conn.close()
 
     return redirect("/")
@@ -375,41 +380,54 @@ def edit(id):
         return redirect("/login")
 
     conn = get_db_connection()
+    cur = conn.cursor()
 
-    # GET request → show form
     if request.method == "GET":
 
-        problem = conn.execute(
-            """SELECT * FROM problems WHERE id = %s AND user_id = %s""",
-            (id,session["user_id"])
-        ).fetchone()
+        cur.execute(
+            """
+            SELECT * FROM problems
+            WHERE id = %s
+            AND user_id = %s
+            """,
+            (id, session["user_id"])
+        )
 
+        problem = cur.fetchone()
+
+        cur.close()
         conn.close()
 
-        return render_template("edit.html", problem=problem)
+        return render_template(
+            "edit.html",
+            problem=problem
+        )
 
-    # POST request → update DB
     title = request.form["title"]
     difficulty = request.form["difficulty"]
     date = request.form["date"]
 
-    conn.execute(
+    cur.execute(
         """
         UPDATE problems
-        SET title = %s, difficulty = %s, date = %s
+        SET title = %s,
+            difficulty = %s,
+            date = %s
         WHERE id = %s
         AND user_id = %s
         """,
         (
-    title,
-    difficulty,
-    date,
-    id,
-    session["user_id"]
-)
+            title,
+            difficulty,
+            date,
+            id,
+            session["user_id"]
+        )
     )
 
     conn.commit()
+
+    cur.close()
     conn.close()
 
     return redirect("/")
@@ -549,20 +567,25 @@ def profile() :
 
     conn = get_db_connection()
 
-    user = conn.execute(
+    cur = conn.cursor()
+
+    cur.execute(
         """
         SELECT * FROM users
         WHERE id = %s
         """,
         (session["user_id"],)
-    ).fetchone()
+    )
+
+    user = cur.fetchone()
 
     query = """
     SELECT * FROM problems
     WHERE user_id = %s
     """
     params = [session["user_id"]]
-    rows = conn.execute(query,params).fetchall()
+    cur.execute(query, params)
+    rows = cur.fetchall()
     problems = []
 
     for r in rows:
@@ -620,8 +643,9 @@ def profile() :
             if (prev_date - current_date).days != 1:
                 break
 
-    streak += 1
-
+        streak += 1
+        
+    cur.close()
     conn.close()
 
     stats = {
