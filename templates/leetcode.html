@@ -1,60 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>LeetCode Stats</title>
-
-    <link rel="stylesheet"
-    href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode Stats - Import</title>
+    <!-- Fonts mapping verbatim to the design specification -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<div class="main-container">
+    <!-- Unified Global Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/" class="logo">🚀 Track Your Code</a>
+        </div>
+        <div class="nav-right">
+            <span class="user-welcome">Syncing Engine v1.0</span>
+            <a href="/" class="nav-link">Dashboard</a>
+        </div>
+    </nav>
 
-    <h1>⚡ {{ username }}'s LeetCode Stats</h1>
+    <!-- Main Container Grid Baseline Layout -->
+    <main class="main-container">
+        
+        <header class="dashboard-header">
+            <h1>⚡ {{ username }}'s LeetCode Stats</h1>
+            <p class="subtitle">Select the solved submissions you want to batch import into your history</p>
+        </header>
 
-    <div class="stats-container">
+        <!-- Main Submission Container Card Component -->
+        <div class="card problem-section">
+            <div class="section-header">
+                <h2>📚 Recent Submissions Found</h2>
+                <!-- Global back anchor configured as a ghost action tool -->
+                <a href="/" class="action-btn edit-btn">← Back to Dashboard</a>
+            </div>
 
-        <form action="/import" method="POST">
-        
-            <ul>
-        
-                {% for s in submissions %}
-        
-                    <li>
-        
-                        <input
-                            type="checkbox"
-                            name="selected"
-                        
-                            value="{{ s.title }}|{{ s.titleSlug }}|{{ s.timestamp }}"
-                        
-                            checked
-                        >
-        
-                        {{ s.title }}
-        
-                    </li>
-        
-                {% endfor %}
-        
-            </ul>
-        
-            <button type="submit">
-                Import Selected
-            </button>
-        
-        </form>
-    </div>
+            <form action="/import" method="POST" class="form-layout">
+                <!-- Tonal Layered List Rows -->
+                <ul class="problem-list">
+                    {% for s in submissions %}
+                        <li class="problem-card">
+                            <div class="problem-info" style="flex-direction: row; align-items: center; gap: var(--space-md);">
+                                <!-- Checkbox Input Style Variant -->
+                                <input 
+                                    type="checkbox" 
+                                    name="selected" 
+                                    value="{{ s.title }}|{{ s.titleSlug }}|{{ s.timestamp }}" 
+                                    id="sub-{{ loop.index }}"
+                                    checked
+                                    style="width: auto; cursor: pointer;"
+                                >
+                                <label for="sub-{{ loop.index }}" style="cursor: pointer; font-weight: 500;">
+                                    {{ s.title }}
+                                </label>
+                            </div>
+                            <!-- Metadata Tag Anchor -->
+                            <div class="problem-meta">
+                                <span class="date-tag mono-label" style="font-size: 10px;">{{ s.timestamp }}</span>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
 
-    <br>
+                <!-- Primary Solid Amber High-Contrast Button for Action Execution -->
+                <div style="margin-top: var(--space-lg); display: flex; justify-content: flex-end;">
+                    <button type="submit" class="btn btn-primary" style="min-width: 200px;">
+                        Import Selected
+                    </button>
+                </div>
+            </form>
+        </div>
 
-    <a href="/">
-        <button class="edit-btn">
-            Back
-        </button>
-    </a>
-
-</div>
+    </main>
 
 </body>
 </html>

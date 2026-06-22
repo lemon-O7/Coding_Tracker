@@ -1,60 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
-
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='style.css') }}"
-    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<div class="container">
+<!-- Integrated Nav Bar for consistent project feel -->
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="/" class="logo">🚀 Track Your Code</a>
+    </div>
+    <div class="nav-right">
+        <span class="user-welcome">Profile Terminal</span>
+        <a href="/" class="nav-link">Dashboard</a>
+    </div>
+</nav>
 
-    <h1>👤 Profile Dashboard</h1>
+<!-- Changed .container to .main-container to inherit layout width -->
+<div class="main-container">
 
-    <!-- USER INFO -->
-    <div class="card">
+    <header class="dashboard-header">
+        <h1>👤 Profile Dashboard</h1>
+    </header>
+
+    <!-- USER INFO CARD -->
+    <div class="card" style="line-height: 2; margin-bottom: var(--space-lg);">
         <p><strong>Username:</strong> {{ user.username }}</p>
         <p><strong>Email:</strong> {{ user.email }}</p>
         <p><strong>Joined:</strong> {{ user.created_at }}</p>
     </div>
 
-    <!-- MAIN STATS -->
-    <div class="grid">
+    <!-- MAIN STATS (Changed .grid to .stats-container, and .stat to .stat-card) -->
+    <div class="stats-container">
 
-        <div class="stat">
-            <div class="big">{{ user.stats.total_solved }}</div>
-            <div>Total Solved</div>
+        <div class="stat-card">
+            <h2>{{ user.stats.total_solved }}</h2>
+            <p>Total Solved</p>
         </div>
 
-        <div class="stat">
-            <div class="big">{{ user.stats.xp }}</div>
-            <div>XP</div>
+        <div class="stat-card xp">
+            <h2>{{ user.stats.xp }}</h2>
+            <p>XP</p>
         </div>
 
-        <div class="stat">
-            <div class="big">{{ user.stats.level }}</div>
-            <div>Level</div>
+        <div class="stat-card level">
+            <h2>{{ user.stats.level }}</h2>
+            <p>Level</p>
         </div>
 
-        <div class="stat">
-            <div class="big">{{ user.stats.streak }}</div>
-            <div>🔥 Streak</div>
+        <div class="stat-card streak">
+            <h2>{{ user.stats.streak }}</h2>
+            <p>🔥 Streak</p>
         </div>
 
     </div>
 
-    <!-- DIFFICULTY BREAKDOWN -->
+    <!-- DIFFICULTY BREAKDOWN (Mapped to your layout's border tokens) -->
     <div class="card">
-        <h3>Difficulty Breakdown</h3>
-        <p>🟢 Easy: {{ user.stats.easy }}</p>
-        <p>🟡 Medium: {{ user.stats.medium }}</p>
-        <p>🔴 Hard: {{ user.stats.hard }}</p>
+        <h2 style="margin-bottom: var(--space-md);">Difficulty Breakdown</h2>
+        <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
+            <p><span class="difficulty-tag easy" style="display:inline-block; width: 80px; text-align: center;">Easy</span> : {{ user.stats.easy }}</p>
+            <p><span class="difficulty-tag medium" style="display:inline-block; width: 80px; text-align: center;">Medium</span> : {{ user.stats.medium }}</p>
+            <p><span class="difficulty-tag hard" style="display:inline-block; width: 80px; text-align: center;">Hard</span> : {{ user.stats.hard }}</p>
+        </div>
     </div>
 
-    <a href="/" class="btn">Back to Dashboard</a>
+    <br>
+    <!-- Standardized to your existing button classes -->
+    <a href="/" class="btn btn-primary" style="text-decoration: none; display: inline-block;">Back to Dashboard</a>
 
 </div>
 

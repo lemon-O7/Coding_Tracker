@@ -3,56 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Problem</title>
-
+    <title>Edit Problem - Deep Code</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body class="auth-page"> <div class="auth-container"> <header class="dashboard-header" style="text-align: center; margin-bottom: var(--space-lg);">
+            <h1 class="headline-lg">✏️ Edit Problem</h1>
+            <p class="subtitle">Modify problem specifications</p>
+        </header>
 
-    <div class="edit-container">
+        <form method="POST" class="auth-form">
 
-        <h1>✏️ Edit Problem</h1>
+            <div class="form-group">
+                <input
+                    type="text"
+                    name="title"
+                    value="{{ problem.title }}"
+                    placeholder="Problem Name"
+                    required
+                >
+            </div>
 
-        <form method="POST" class="edit-form">
+            <div class="form-group">
+                <select name="difficulty">
+                    <option value="Easy" {% if problem.difficulty == "Easy" %}selected{% endif %}>
+                        Easy
+                    </option>
+                    <option value="Medium" {% if problem.difficulty == "Medium" %}selected{% endif %}>
+                        Medium
+                    </option>
+                    <option value="Hard" {% if problem.difficulty == "Hard" %}selected{% endif %}>
+                        Hard
+                    </option>
+                </select>
+            </div>
 
-            <input
-                type="text"
-                name="title"
-                value="{{ problem.title }}"
-                required
-            >
+            <div class="form-group">
+                <input
+                    type="date"
+                    name="date"
+                    value="{{ problem.date }}"
+                    required
+                >
+            </div>
 
-            <select name="difficulty">
-
-                <option value="Easy"
-                {% if problem.difficulty == "Easy" %}selected{% endif %}>
-                Easy
-                </option>
-
-                <option value="Medium"
-                {% if problem.difficulty == "Medium" %}selected{% endif %}>
-                Medium
-                </option>
-
-                <option value="Hard"
-                {% if problem.difficulty == "Hard" %}selected{% endif %}>
-                Hard
-                </option>
-
-            </select>
-
-            <input
-                type="date"
-                name="date"
-                value="{{ problem.date }}"
-                required
-            >
-
-            <button type="submit">Update Problem</button>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--space-sm);">
+                Update Problem
+            </button>
 
         </form>
 
-        <a href="/" class="back-btn">⬅ Back to Home</a>
+        <div style="text-align: center; margin-top: var(--space-lg);">
+            <a href="/" class="action-btn edit-btn" style="text-decoration: none; display: inline-block; padding: var(--space-xs) var(--space-md);">
+                ⬅ Back to Home
+            </a>
+        </div>
 
     </div>
 
