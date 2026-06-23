@@ -1,55 +1,137 @@
 # 🚀 Coding Tracker
 
-A full-stack Flask web application that helps programmers track coding practice, visualize progress, and import recent LeetCode submissions.
+A full-stack Flask web application that helps programmers track coding practice, maintain streaks, earn XP, and import solved problems from LeetCode.
 
-## Features
+## 🌐 Live Demo
 
-- 🔐 Secure user authentication
-- 📚 Track solved coding problems
-- ⚡ Import recent LeetCode submissions
-- 🔥 Streak tracking
-- 🏆 XP and level progression
-- 📊 Interactive analytics dashboard
-- 👤 Personal profile page
-- ✏️ Edit and delete problem entries
+(https://track-your-code.onrender.com)
 
-## Tech Stack
+## 📸 Screenshots
+
+### Dashboard
+
+![Dashboard](assets/Dashboard.png)
+
+### Profile Page
+
+![Profile](assets/Profile.png)
+
+### LeetCode Import
+
+![LeetCode](assets/LeetcodeImport.png)
+
+---
+
+## ✨ Features
+
+* 🔐 User Authentication (Register/Login)
+* 🔒 Secure password hashing
+* 📈 Coding progress dashboard
+* 🔥 Daily streak tracking
+* ⭐ XP and leveling system
+* 🏆 Achievement badges
+* 📊 Problem statistics by difficulty
+* 👤 User profile page
+* 📥 Import accepted submissions from LeetCode
+* ☁️ PostgreSQL database
+* 🚀 Deployed on Render
+
+---
+
+## 🛠️ Tech Stack
 
 ### Backend
-- Flask
-- SQLite
-- Requests
-- Werkzeug
+
+* Flask
+* PostgreSQL
+* Psycopg2
 
 ### Frontend
-- HTML
-- CSS
-- Chart.js
-- Jinja2
 
-## Screenshots
+* HTML
+* CSS
+* Jinja2 Templates
 
-(Add screenshots after deployment)
+### Other Tools
 
-## Installation
+* LeetCode GraphQL API
+* Render
+* Git & GitHub
 
-```bash
-git clone <repo-url>
-cd coding-tracker
+---
+
+## 📂 Project Structure
+
+coding-tracker/
+
+├── app.py
+
+├── database.py
+
+├── templates/
+
+├── static/
+
+│   └── style.css
+
+├── requirements.txt
+
+├── Procfile
+
+└── README.md
+
+---
+
+## ⚙️ Installation
+
+Clone the repository:
+
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
+
+cd YOUR_REPO
+
+Install dependencies:
 
 pip install -r requirements.txt
 
+Create a .env file:
+
+SECRET_KEY=your_secret_key
+
+DATABASE_URL=your_database_url
+
+Run the application:
+
 python app.py
-```
 
-## Future Improvements
+---
 
-- Email verification
-- Password reset
-- Full LeetCode sync
-- PostgreSQL database
-- Public profiles
+## 🎯 What I Learned
 
-## Author
+During this project I learned:
+
+* Flask web development
+* Authentication and sessions
+* Password hashing
+* PostgreSQL database integration
+* SQL query design
+* API integration with LeetCode
+* Deployment using Render
+* Git and GitHub workflows
+* Debugging production issues
+
+---
+
+## 🚀 Future Improvements
+
+* Better mobile responsiveness
+* Dark/Light mode toggle
+* Faster LeetCode imports
+* Data visualizations
+* Weekly and monthly progress reports
+
+---
+
+## 👨‍💻 Author
 
 Sarthak Upadhyay
